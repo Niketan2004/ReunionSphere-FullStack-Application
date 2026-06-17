@@ -1,0 +1,28 @@
+{
+     "configurations": [
+          {
+               "type": "java",
+               "name": "ServiceRegistryApplication",
+               "request": "launch",
+               "mainClass": "com.ReunionSphere.Service_Registry.ServiceRegistryApplication",
+               "projectName": "Service-Registry"
+          },
+          {
+               "type": "java",
+               "name": "UserServiceApplication",
+               "request": "launch",
+               "mainClass": "com.ReunionSphere.User_Service.UserServiceApplication",
+               "projectName": "User-Service"
+          },
+          {
+               "type": "java",
+               "name": "Spring Boot-ApiGatewayApplication<api-gateway>",
+               "request": "launch",
+               "cwd": "${workspaceFolder}",
+               "mainClass": "com.ReunionSphere.api_gateway.ApiGatewayApplication",
+               "projectName": "api-gateway",
+               "args": "",
+               "envFile": "${workspaceFolder}/.env"
+          }
+     ]
+}
