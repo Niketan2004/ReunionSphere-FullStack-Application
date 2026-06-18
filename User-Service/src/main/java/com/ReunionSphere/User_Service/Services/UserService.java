@@ -7,8 +7,10 @@ import org.apache.tomcat.util.descriptor.LocalResolver;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ReunionSphere.User_Service.Dto.LocationDto;
 import com.ReunionSphere.User_Service.Dto.SubscriptionDto;
@@ -35,6 +37,7 @@ public class UserService {
      private final LocationService locationService;
      private final SubscriptionService subscriptionService;
      private final LocationRepo locationRepo;
+     private final CloudinaryService cloudinaryService;
 
      /**
       * Retrieves a user profile by their unique user ID.
@@ -90,11 +93,11 @@ public class UserService {
       * @param user the {@link UserProfileDto} containing the updated information
       * @return the updated {@link UserProfileDto}
       * @throws IllegalArgumentException if the provided user DTO is null
-      * @throws UserNotfoundException if the user to update does not exist
+      * @throws UserNotfoundException    if the user to update does not exist
       */
      @CachePut(value = "users", key = "#user.userId")
      @Transactional
-     public UserProfileDto updateUserProfile(UserProfileDto user) {
+     public UserProfileDto updateUserProfile(MultipartFile image, UserProfileDto user) {
           if (user == null) {
                log.error("Failed to update user profile as user is null");
                throw new IllegalArgumentException("User details should be provided");
@@ -105,6 +108,9 @@ public class UserService {
                          log.error("User does not exist with id {}", user.getUserId());
                          return new UserNotfoundException("User does not exists with id " + user.getUserId());
                     });
+          if (!image.isEmpty()) {
+               user.setProfileImageUrl(cloudinaryService.uploadProfileImage(image));
+          }
           oldUser = entityMapper.toUserProfiles(oldUser, user);
           locationService.updateUserLocationDto(user.getLocation());
           userProfilesRepo.saveAndFlush(oldUser);
@@ -113,15 +119,18 @@ public class UserService {
      }
 
      /**
-      * Creates a new user profile, including their location and initial subscription.
+      * Creates a new user profile, including their location and initial
+      * subscription.
       *
       * @param registerUser the registration details of the new user
       * @return the created {@link UserProfileDto}
-      * @throws IllegalArgumentException if the registration details or auth ID are invalid
-      * @throws UserAlreadyExistsException if a user with the same email or phone number already exists
+      * @throws IllegalArgumentException   if the registration details or auth ID are
+      *                                    invalid
+      * @throws UserAlreadyExistsException if a user with the same email or phone
+      *                                    number already exists
       */
      @Transactional
-     public UserProfileDto createUserProfile(RegisterUserDto registerUser) {
+     public UserProfileDto createUserProfile(MultipartFile multipartFile, RegisterUserDto registerUser) {
           log.info("Creating user profile for email: {}", registerUser != null ? registerUser.getEmail() : "null");
           if (registerUser == null) {
                log.error("Register user DTO is null");
@@ -130,7 +139,8 @@ public class UserService {
 
           if (userProfilesRepo.findUserIdByPhoneNumber(registerUser.getPhoneNumber()) != null
                     || userProfilesRepo.findByEmail(registerUser.getEmail()).isPresent()) {
-               log.error("User Already Exists with email: {} or phone: {}", registerUser.getEmail(), registerUser.getPhoneNumber());
+               log.error("User Already Exists with email: {} or phone: {}", registerUser.getEmail(),
+                         registerUser.getPhoneNumber());
                throw new UserAlreadyExistsException(
                          "User Already Exists please try with different email or phone Number");
           }
@@ -144,6 +154,14 @@ public class UserService {
                     locationService.createLocation(registerUser.getLocation()));
 
           UserProfiles userProfiles = new UserProfiles();
+          if (!multipartFile.isEmpty()) {
+               log.info("User has uploaded profile image. Setting it as profile picture ");
+               userProfiles.setProfileImageUrl(uploadImage(multipartFile));
+          } else {
+               log.info("No profile Image found! Setting Default profile image");
+               userProfiles.setProfileImageUrl(
+                         "https://res.cloudinary.com/db0v87xw1/image/upload/v1781782898/default-profile-picture-avatar-user-avatar-icon-person-icon-head-icon-profile-picture-icons-default-anonymous-user-male-and-female-businessman-photo-placeholder-social-network-avatar-portrait-free-vector_gi9cii.jpg");
+          }
           userProfiles.setAuthUserId(registerUser.getAuthUserId());
           userProfiles.setFirstName(registerUser.getFirstName());
           userProfiles.setMiddleName(registerUser.getMiddleName());
@@ -151,7 +169,6 @@ public class UserService {
           userProfiles.setEmail(registerUser.getEmail());
           userProfiles.setPhoneNumber(registerUser.getPhoneNumber());
           userProfiles.setUserRole(registerUser.getUserRole());
-          userProfiles.setProfileImageUrl(registerUser.getProfileImageUrl());
           userProfiles.setLocation(savedLocation);
 
           userProfiles = userProfilesRepo.saveAndFlush(userProfiles);
@@ -165,7 +182,7 @@ public class UserService {
           createSubscriptionDto.setUserRole(registerUser.getUserRole());
           createSubscriptionDto.setIsActive(true);
           createSubscriptionDto.setIsVerified(true);
-          
+
           subscriptionService.createSubscription(createSubscriptionDto);
 
           log.info("Successfully created user profile and subscription for email: {}", registerUser.getEmail());
@@ -193,5 +210,9 @@ public class UserService {
           userProfilesRepo.deleteById(userId);
           log.info("Successfully deleted user profile for userId: {}", userId);
           return true;
+     }
+
+     public String uploadImage(MultipartFile multipartFile) {
+          return cloudinaryService.uploadProfileImage(multipartFile);
      }
 }
