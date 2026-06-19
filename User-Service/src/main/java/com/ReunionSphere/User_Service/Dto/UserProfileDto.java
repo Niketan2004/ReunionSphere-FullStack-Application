@@ -29,6 +29,7 @@ public class UserProfileDto implements Serializable {
      private Boolean isVerified;
      private LocationDto location;
      private String profileImageUrl;
+     private String profileImagePublicId;
      private LocalDateTime createdAt;
      private LocalDateTime updatedAt;
 

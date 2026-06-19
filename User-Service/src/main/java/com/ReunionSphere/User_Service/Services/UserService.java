@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ReunionSphere.User_Service.Dto.CloudinaryResponse;
 import com.ReunionSphere.User_Service.Dto.LocationDto;
 import com.ReunionSphere.User_Service.Dto.SubscriptionDto;
 import com.ReunionSphere.User_Service.Dto.UserProfileDto;
@@ -108,10 +109,21 @@ public class UserService {
                          log.error("User does not exist with id {}", user.getUserId());
                          return new UserNotfoundException("User does not exists with id " + user.getUserId());
                     });
-          if (!image.isEmpty()) {
-               user.setProfileImageUrl(cloudinaryService.uploadProfileImage(image));
+          if (image != null) {
+               log.info("User has uploaded profile image. Updating it as profile picture ");
+               cloudinaryService.deleteProfileImage(user.getProfileImagePublicId());
+               CloudinaryResponse response = uploadImage(image);
+               user.setProfileImageUrl(response.getSecureUrl());
+               user.setProfileImagePublicId(response.getPublicId());
+               log.info("Profile Picture saved successfully");
+          } else {
+               log.info("No profile Image found! Setting Default profile image");
+               user.setProfileImageUrl(
+                         "https://res.cloudinary.com/db0v87xw1/image/upload/v1781782898/default%20pic.jpg");
+               // userProfiles.setProfileImagePublicId("default pic");
+
           }
-          oldUser = entityMapper.toUserProfiles(oldUser, user);
+          entityMapper.updateUserProfileFromDto(user, oldUser);
           locationService.updateUserLocationDto(user.getLocation());
           userProfilesRepo.saveAndFlush(oldUser);
           log.info("Successfully updated user profile for userId: {}", user.getUserId());
@@ -154,13 +166,17 @@ public class UserService {
                     locationService.createLocation(registerUser.getLocation()));
 
           UserProfiles userProfiles = new UserProfiles();
-          if (!multipartFile.isEmpty()) {
+          if (multipartFile != null) {
                log.info("User has uploaded profile image. Setting it as profile picture ");
-               userProfiles.setProfileImageUrl(uploadImage(multipartFile));
+               CloudinaryResponse response = uploadImage(multipartFile);
+               userProfiles.setProfileImageUrl(response.getSecureUrl());
+               userProfiles.setProfileImagePublicId(response.getPublicId());
+               log.info("Profile Picture saved successfully");
           } else {
                log.info("No profile Image found! Setting Default profile image");
                userProfiles.setProfileImageUrl(
-                         "https://res.cloudinary.com/db0v87xw1/image/upload/v1781782898/default-profile-picture-avatar-user-avatar-icon-person-icon-head-icon-profile-picture-icons-default-anonymous-user-male-and-female-businessman-photo-placeholder-social-network-avatar-portrait-free-vector_gi9cii.jpg");
+                         "https://res.cloudinary.com/db0v87xw1/image/upload/v1781782898/default%20pic.jpg");
+               // userProfiles.setProfileImagePublicId("default pic");
           }
           userProfiles.setAuthUserId(registerUser.getAuthUserId());
           userProfiles.setFirstName(registerUser.getFirstName());
@@ -206,13 +222,16 @@ public class UserService {
                          log.error("User Not Found with User Id {}", userId);
                          return new UserNotfoundException("User Not Found with User Id " + userId);
                     });
-
+          // Deleting Profile Image from cloudinary
+          cloudinaryService.deleteProfileImage(user.getProfileImagePublicId());
+          log.info("Deleted profile image from cloudinary");
           userProfilesRepo.deleteById(userId);
           log.info("Successfully deleted user profile for userId: {}", userId);
           return true;
      }
 
-     public String uploadImage(MultipartFile multipartFile) {
+     // Uploading image to the cloudinary
+     public CloudinaryResponse uploadImage(MultipartFile multipartFile) {
           return cloudinaryService.uploadProfileImage(multipartFile);
      }
 }

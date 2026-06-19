@@ -77,6 +77,8 @@ public class UserProfiles {
 
   private String profileImageUrl;
 
+  private String profileImagePublicId;
+
   @CreationTimestamp
   @Column(updatable = false)
   private LocalDateTime createdAt;

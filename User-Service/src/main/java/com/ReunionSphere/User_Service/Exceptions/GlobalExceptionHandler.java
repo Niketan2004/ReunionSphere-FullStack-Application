@@ -17,6 +17,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(LocationNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleLocationNotFoundException(LocationNotFoundException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
@@ -48,7 +53,7 @@ public class GlobalExceptionHandler {
         errorDetails.put("status", status.value());
         errorDetails.put("error", status.getReasonPhrase());
         errorDetails.put("message", message);
-        
+
         return new ResponseEntity<>(errorDetails, status);
     }
 }
