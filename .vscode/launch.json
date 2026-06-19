@@ -2,6 +2,13 @@
      "configurations": [
           {
                "type": "java",
+               "name": "AuthenticationServiceApplication",
+               "request": "launch",
+               "mainClass": "com.ReunionSphere.authentication_service.AuthenticationServiceApplication",
+               "projectName": ""
+          },
+          {
+               "type": "java",
                "name": "ServiceRegistryApplication",
                "request": "launch",
                "mainClass": "com.ReunionSphere.Service_Registry.ServiceRegistryApplication",

@@ -52,7 +52,7 @@ public class UserProfiles {
 
   @NotBlank(message = "Phone Number should not be blank")
   @Size(min = 10, max = 10)
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String phoneNumber;
 
   @Enumerated(EnumType.STRING)
