@@ -3,9 +3,7 @@ package com.ReunionSphere.authentication_service.Entity;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.Collate;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
@@ -16,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,7 +39,7 @@ public class OauthLinkedAccounts {
      private AuthUsers authUsers;
 
      @Column(nullable = false, length = 50)
-     private String provideName;
+     private String providerName;
 
      @Column(nullable = false)
      private String providerUserId;
