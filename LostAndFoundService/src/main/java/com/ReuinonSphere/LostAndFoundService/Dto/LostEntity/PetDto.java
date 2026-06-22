@@ -2,6 +2,15 @@ package com.ReuinonSphere.LostAndFoundService.Dto.LostEntity;
 
 import com.ReuinonSphere.LostAndFoundService.Enums.Species;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class PetDto {
      private Species species;
      private String breed;
