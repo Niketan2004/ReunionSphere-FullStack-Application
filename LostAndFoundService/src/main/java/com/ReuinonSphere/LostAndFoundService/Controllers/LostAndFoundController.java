@@ -1,9 +1,5 @@
 package com.ReuinonSphere.LostAndFoundService.Controllers;
 
-import com.cloudinary.Cloudinary;
-
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,17 +22,18 @@ import com.ReuinonSphere.LostAndFoundService.Dto.RegisterReportDto;
 import com.ReuinonSphere.LostAndFoundService.Dto.ReportDto;
 import com.ReuinonSphere.LostAndFoundService.Services.ReportService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/lost-report")
+@RequestMapping("/api/v1/reports")
 @RequiredArgsConstructor
 public class LostAndFoundController {
      // Injected LostReport Service
      private final ReportService reportService;
 
      // Fetching all reports
-     @GetMapping("/")
+     @GetMapping
      public ResponseEntity<Page<ReportDto>> findAllReports(Pageable pageable) {
           return ResponseEntity.ok(reportService.findAllReports(pageable));
      }
@@ -47,34 +45,32 @@ public class LostAndFoundController {
      }
 
      // Creating Report
-     @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
      public ResponseEntity<ReportDto> createLostReport(
-               @RequestPart(value = "reportDto", required = true) RegisterReportDto registerReportDto,
+               @Valid @RequestPart(value = "reportDto", required = true) RegisterReportDto registerReportDto,
                @RequestPart(value = "images", required = true) List<MultipartFile> images) {
           return ResponseEntity.status(HttpStatus.CREATED).body(reportService.createReport(registerReportDto, images));
      }
 
      // Updating Report
-     @PutMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
      public ResponseEntity<ReportDto> updateLostReport(
-               @RequestPart(value = "reportDto", required = true) ReportDto reportDto,
+               @Valid @RequestPart(value = "reportDto", required = true) ReportDto reportDto,
                @RequestPart(value = "images", required = false) List<MultipartFile> images) {
-          return ResponseEntity.status(HttpStatus.FOUND).body(reportService.updateReport(reportDto, images));
+          return ResponseEntity.status(HttpStatus.OK).body(reportService.updateReport(reportDto, images));
      }
 
      // Deleting report
      @DeleteMapping("/{id}")
      public ResponseEntity<?> deleteReport(@PathVariable String id) {
           reportService.deleteReportById(id);
-          return ResponseEntity.status(HttpStatus.FOUND).build();
+          return ResponseEntity.noContent().build();
      }
 
-
-
      // Deleting All report by id
-     @DeleteMapping("/")
-     public ResponseEntity<?> deleteReport(@RequestBody List<String> reportIds) {
+     @DeleteMapping
+     public ResponseEntity<?> deleteAllReports(@RequestBody List<String> reportIds) {
           reportService.deleteAllById(reportIds);
-          return ResponseEntity.status(HttpStatus.FOUND).build();
+          return ResponseEntity.noContent().build();
      }
 }

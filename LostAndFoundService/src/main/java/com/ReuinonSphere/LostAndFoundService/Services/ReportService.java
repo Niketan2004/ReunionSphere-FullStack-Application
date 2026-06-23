@@ -2,6 +2,10 @@ package com.ReuinonSphere.LostAndFoundService.Services;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,6 +57,7 @@ public class ReportService {
       * @param multipartFile     images associated with the report
       * @return persisted report data
       */
+     @CacheEvict(value = "reports-pages", allEntries = true)
      public ReportDto createReport(RegisterReportDto registerReportDto, List<MultipartFile> multipartFile) {
           log.info("Recieved request to create ne report");
           if (multipartFile == null || multipartFile.isEmpty()) {
@@ -89,6 +94,11 @@ public class ReportService {
       * @return updated report data
       * @throws ReportNotFoundException if the report does not exist
       */
+     @Caching(put = {
+               @CachePut(value = "reports", key = "#reportDto.reportId")
+     }, evict = {
+               @CacheEvict(value = "reports-pages", allEntries = true)
+     })
      public ReportDto updateReport(ReportDto reportDto, List<MultipartFile> multipartFile) {
           log.info("Received request to update report with id={}",
                     reportDto.getReportId());
@@ -132,6 +142,7 @@ public class ReportService {
       * @param pageable pagination and sorting configuration
       * @return paginated report data
       */
+     @Cacheable(value = "reports-pages", key = "#pageable.pageNumber + ':' + #pageable.pageSize + ':' + #pageable.sort")
      public Page<ReportDto> findAllReports(Pageable pageable) {
           log.info("Fetching reports. page={}, size={}, sort={}",
                     pageable.getPageNumber(),
@@ -148,6 +159,7 @@ public class ReportService {
       * @return report data
       * @throws ReportNotFoundException if no report exists with the given id
       */
+     @Cacheable(value = "reports", key = "#id")
      public ReportDto findById(String id) {
           log.debug("Fetching report with id={}", id);
           Report report = reportRepo.findById(id)
@@ -170,6 +182,10 @@ public class ReportService {
       * @param id report identifier
       * @throws ReportNotFoundException if the report does not exist
       */
+     @Caching(evict = {
+               @CacheEvict(value = "reports", key = "#id"),
+               @CacheEvict(value = "reports-pages", allEntries = true)
+     })
      public void deleteReportById(String id) {
           log.info("Received request to delete report with id={}", id);
           if (!reportRepo.existsById(id)) {
@@ -191,6 +207,10 @@ public class ReportService {
       * @param ids collection of report identifiers
       * @throws ReportNotFoundException if one or more reports do not exist
       */
+     @Caching(evict = {
+               @CacheEvict(value = "reports", allEntries = true),
+               @CacheEvict(value = "reports-pages", allEntries = true)
+     })
      public void deleteAllById(List<String> ids) {
           log.info("Received request to delete {} report(s)", ids.size());
           List<Report> reports = reportRepo.findAllById(ids);
