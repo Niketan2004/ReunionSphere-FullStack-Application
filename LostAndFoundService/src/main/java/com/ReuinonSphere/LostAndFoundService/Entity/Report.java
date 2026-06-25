@@ -1,6 +1,7 @@
 package com.ReuinonSphere.LostAndFoundService.Entity;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class Report {
      private Map<String, Object> customAddress; // this is Custom address details given by users
 
      @NotNull
-     private LocalDateTime incidentdate;
+     private LocalDateTime incidentDate;
 
      @NotNull
      private List<String> imageUrls;
@@ -58,7 +59,7 @@ public class Report {
      // Polymorphic map to store specific attributes (e.g., pet breed, vehicle
      // license plate)
      @NotNull
-     private Map<String, Object> details;
+     private Map<String, Object> lostEntityDetails;
      
 
      @CreatedDate

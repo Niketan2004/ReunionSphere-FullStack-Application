@@ -130,8 +130,8 @@ public class ReportService {
                reportDto.setImageUrls(existingReport.getImageUrls());
                reportDto.setPublicId(existingReport.getPublicId());
           }
-
-          Report savedReport = reportRepo.save(entityMappers.toEntity(reportDto));
+          entityMappers.updateEntityFromDto(reportDto, existingReport);
+          Report savedReport = reportRepo.save(existingReport);
           return entityMappers.toDto(savedReport);
      }
 
