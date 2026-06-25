@@ -1,0 +1,32 @@
+package com.ReuinonSphere.LostAndFoundService.Dto;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
+import com.ReuinonSphere.LostAndFoundService.Enums.EntityType;
+import com.ReuinonSphere.LostAndFoundService.Enums.Status;
+
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+@Data
+@RequiredArgsConstructor
+public class ReportDto  implements Serializable {
+
+     private String reportId;
+     private String reporterId;
+     private EntityType entityType;
+     private Status status;
+     private LocationDto lostLocation; // This is the Location details of lost one
+     private Map<String, Object> customAddress; // this is Custom address details given by users
+     private LocalDateTime incidentDate;
+     private List<String> imageUrls;
+     private List<String> publicId;
+     private Map<String, Object> lostEntityDetails;
+     private LocalDateTime createdAt;
+     private LocalDateTime updatedAt;
+}
