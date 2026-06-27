@@ -93,7 +93,7 @@ public class AuthenticationService {
           syncUserProfileWithUserService(authUser.getAuthId(), registerUserRequest, role);
 
           // Generate and return a secure JWT representing the authenticated session
-          String token = jwtTokenProvider.generateToken(authUser.getEmail(), authUser.getRole());
+          String token = jwtTokenProvider.generateToken(authUser.getAuthId(),authUser.getEmail(), authUser.getRole());
           return new AuthResponse(token);
      }
 
@@ -120,7 +120,7 @@ public class AuthenticationService {
           }
 
           // Generate secure JWT containing user identity and role claims
-          String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRole());
+          String token = jwtTokenProvider.generateToken(user.getAuthId(),user.getEmail(), user.getRole());
           return new AuthResponse(token);
      }
 
@@ -157,7 +157,7 @@ public class AuthenticationService {
           }
           
           // Issue a unified application JWT for downstream microservice authentication
-          String token = jwtTokenProvider.generateToken(user.getEmail(), user.getRole());
+          String token = jwtTokenProvider.generateToken(user.getAuthId(),user.getEmail(), user.getRole());
           return new AuthResponse(token);
      }
 

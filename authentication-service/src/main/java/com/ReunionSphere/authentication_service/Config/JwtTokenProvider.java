@@ -52,6 +52,7 @@ public class JwtTokenProvider {
       */
      public String generateToken(Authentication authentication) {
           String userName = authentication.getName();
+          
           Date now = new Date();
           Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
@@ -70,12 +71,13 @@ public class JwtTokenProvider {
       * @param role the user's assigned system role
       * @return the signed JWT string
       */
-     public String generateToken(String email, Roles role) {
+     public String generateToken(String authUserId,String email, Roles role) {
           Date now = new Date();
           Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
           return Jwts.builder()
                     .subject(email)
+                    .claim("userId", authUserId)
                     .claim("role", role.name())
                     .issuedAt(now)
                     .expiration(expiryDate)
