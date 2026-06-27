@@ -48,7 +48,7 @@ public class UserController {
      public ResponseEntity<UserProfileDto> getUserByIEmail(@PathVariable String email) {
           return ResponseEntity.status(HttpStatus.FOUND).body(userService.getUserProfileByEmail(email));
      }
-
+     
      // Updating User Profile
      @PutMapping("/{userId}")
      public ResponseEntity<UserProfileDto> updateUser(@PathVariable String userId,

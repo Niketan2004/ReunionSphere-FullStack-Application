@@ -36,6 +36,17 @@
                "mainClass": "com.ReunionSphere.api_gateway.ApiGatewayApplication",
                "projectName": "api-gateway",
                "args": "",
+               "envFile": "${workspaceFolder}/.env",
+               "vmArgs": " -Dcom.sun.management.jmxremote"
+          },
+          {
+               "type": "java",
+               "name": "Spring Boot-AuthenticationServiceApplication<authentication-service>",
+               "request": "launch",
+               "cwd": "${workspaceFolder}",
+               "mainClass": "com.ReunionSphere.authentication_service.AuthenticationServiceApplication",
+               "projectName": "authentication-service",
+               "args": "",
                "envFile": "${workspaceFolder}/.env"
           }
      ]

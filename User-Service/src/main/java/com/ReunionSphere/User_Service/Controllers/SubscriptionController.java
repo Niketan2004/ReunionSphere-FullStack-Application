@@ -69,14 +69,14 @@ public class SubscriptionController {
      }
 
      // DELETING SUBSCRIPTION BY ID
-     @DeleteMapping("/{subscriptionId}")
+     @DeleteMapping("/id/{subscriptionId}")
      public ResponseEntity<Boolean> deleteSubscriptionById(@PathVariable String subscriptionId) {
           return ResponseEntity.status(HttpStatus.FOUND)
                     .body(subscriptionService.deleteSubscription(subscriptionId));
      }
 
      // DELETING SUBSCRIPTION BY EMAIL
-     @DeleteMapping("/{emailId}")
+     @DeleteMapping("/email/{emailId}")
      public ResponseEntity<Boolean> deleteSubscriptionByEmail(@PathVariable String emailId) {
           return ResponseEntity.status(HttpStatus.FOUND)
                     .body(subscriptionService.deleteSubscriptionByEmail(emailId));
