@@ -20,5 +20,4 @@ public class RegisterUserRequest {
      private String phoneNumber;
      private Roles userRole;
      private LocationDto location;
-     private String profileImageUrl;
 }

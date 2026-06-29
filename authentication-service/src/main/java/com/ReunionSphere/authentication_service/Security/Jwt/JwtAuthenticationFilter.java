@@ -1,4 +1,4 @@
-package com.ReunionSphere.authentication_service.Config;
+package com.ReunionSphere.authentication_service.Security.Jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

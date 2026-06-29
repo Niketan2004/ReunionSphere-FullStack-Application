@@ -1,20 +1,15 @@
 package com.ReunionSphere.User_Service.Services;
 
-import com.ReunionSphere.User_Service.Repositories.LocationRepo;
 import java.util.List;
 
-import org.apache.tomcat.util.descriptor.LocalResolver;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ReunionSphere.User_Service.Dto.CloudinaryResponse;
-import com.ReunionSphere.User_Service.Dto.LocationDto;
-import com.ReunionSphere.User_Service.Dto.SubscriptionDto;
 import com.ReunionSphere.User_Service.Dto.UserProfileDto;
 import com.ReunionSphere.User_Service.Dto.RegistrationDto.CreateSubscriptionDto;
 import com.ReunionSphere.User_Service.Dto.RegistrationDto.RegisterUserDto;
@@ -37,7 +32,6 @@ public class UserService {
      private final EntityMapper entityMapper;
      private final LocationService locationService;
      private final SubscriptionService subscriptionService;
-     private final LocationRepo locationRepo;
      private final CloudinaryService cloudinaryService;
 
      /**
@@ -109,20 +103,15 @@ public class UserService {
                          log.error("User does not exist with id {}", user.getUserId());
                          return new UserNotfoundException("User does not exists with id " + user.getUserId());
                     });
-          if (image != null) {
-               log.info("User has uploaded profile image. Updating it as profile picture ");
-               cloudinaryService.deleteProfileImage(user.getProfileImagePublicId());
+          // Uploading images to cloudinary
+          if (image != null) {  
+               log.debug("Uploading Profile Image to cloudinary");
                CloudinaryResponse response = uploadImage(image);
                user.setProfileImageUrl(response.getSecureUrl());
                user.setProfileImagePublicId(response.getPublicId());
                log.info("Profile Picture saved successfully");
-          } else {
-               log.info("No profile Image found! Setting Default profile image");
-               user.setProfileImageUrl(
-                         "https://res.cloudinary.com/db0v87xw1/image/upload/v1781782898/default%20pic.jpg");
-               // userProfiles.setProfileImagePublicId("default pic");
-
           }
+
           entityMapper.updateUserProfileFromDto(user, oldUser);
           locationService.updateUserLocationDto(user.getLocation());
           userProfilesRepo.saveAndFlush(oldUser);
@@ -142,7 +131,7 @@ public class UserService {
       *                                    number already exists
       */
      @Transactional
-     public UserProfileDto createUserProfile(MultipartFile multipartFile, RegisterUserDto registerUser) {
+     public UserProfileDto createUserProfile(RegisterUserDto registerUser) {
           log.info("Creating user profile for email: {}", registerUser != null ? registerUser.getEmail() : "null");
           if (registerUser == null) {
                log.error("Register user DTO is null");
@@ -166,18 +155,8 @@ public class UserService {
                     locationService.createLocation(registerUser.getLocation()));
 
           UserProfiles userProfiles = new UserProfiles();
-          if (multipartFile != null) {
-               log.info("User has uploaded profile image. Setting it as profile picture ");
-               CloudinaryResponse response = uploadImage(multipartFile);
-               userProfiles.setProfileImageUrl(response.getSecureUrl());
-               userProfiles.setProfileImagePublicId(response.getPublicId());
-               log.info("Profile Picture saved successfully");
-          } else {
-               log.info("No profile Image found! Setting Default profile image");
-               userProfiles.setProfileImageUrl(
-                         "https://res.cloudinary.com/db0v87xw1/image/upload/v1781782898/default%20pic.jpg");
-               // userProfiles.setProfileImagePublicId("default pic");
-          }
+          
+
           userProfiles.setAuthUserId(registerUser.getAuthUserId());
           userProfiles.setFirstName(registerUser.getFirstName());
           userProfiles.setMiddleName(registerUser.getMiddleName());
@@ -232,6 +211,19 @@ public class UserService {
 
      // Uploading image to the cloudinary
      public CloudinaryResponse uploadImage(MultipartFile multipartFile) {
-          return cloudinaryService.uploadProfileImage(multipartFile);
+          if (multipartFile != null) {
+               log.info("User has uploaded profile image. Setting it as profile picture ");
+               return cloudinaryService.uploadProfileImage(multipartFile);
+          } else {
+               log.info("No profile Image found! Setting Default profile image");
+               CloudinaryResponse cloudinaryResponse = new CloudinaryResponse();
+               cloudinaryResponse.setPublicId("default pic");
+               cloudinaryResponse.setSecureUrl(
+                         "https://res.cloudinary.com/db0v87xw1/image/upload/v1781782898/default%20pic.jpg");
+               return cloudinaryResponse;
+
+          }
+
      }
+
 }

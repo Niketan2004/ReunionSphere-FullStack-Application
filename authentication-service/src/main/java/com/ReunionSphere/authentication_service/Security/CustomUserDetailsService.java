@@ -1,4 +1,4 @@
-package com.ReunionSphere.authentication_service.Config;
+package com.ReunionSphere.authentication_service.Security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

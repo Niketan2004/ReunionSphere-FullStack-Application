@@ -22,6 +22,7 @@ import com.ReunionSphere.User_Service.Services.UserService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
@@ -48,7 +49,7 @@ public class UserController {
      public ResponseEntity<UserProfileDto> getUserByIEmail(@PathVariable String email) {
           return ResponseEntity.status(HttpStatus.FOUND).body(userService.getUserProfileByEmail(email));
      }
-     
+
      // Updating User Profile
      @PutMapping("/{userId}")
      public ResponseEntity<UserProfileDto> updateUser(@PathVariable String userId,
@@ -58,11 +59,10 @@ public class UserController {
      }
 
      // Creating User Profile
-     @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+     @PostMapping("/")
      public ResponseEntity<UserProfileDto> createUser(
-               @RequestPart(value = "profileImage", required = false) MultipartFile image,
-               @RequestPart(value = "registerUserDto") RegisterUserDto registerUserDto) {
-          return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUserProfile(image, registerUserDto));
+            @RequestBody RegisterUserDto registerUserDto) {
+          return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUserProfile(registerUserDto));
      }
 
      // Creating User Profile

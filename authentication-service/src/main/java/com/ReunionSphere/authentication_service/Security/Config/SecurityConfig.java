@@ -1,4 +1,4 @@
-package com.ReunionSphere.authentication_service.Config;
+package com.ReunionSphere.authentication_service.Security.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.ReunionSphere.authentication_service.Security.Jwt.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -65,7 +67,7 @@ public class SecurityConfig {
                     // Establish access control rules for public authentication endpoints and API
                     // documentation
                     .authorizeHttpRequests(auth -> auth
-                              .requestMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/actuator/**")
+                              .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/actuator/**")
                               .permitAll()
                               .anyRequest().authenticated())
 

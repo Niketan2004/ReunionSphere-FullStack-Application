@@ -1,4 +1,4 @@
-package com.ReunionSphere.authentication_service.Config;
+package com.ReunionSphere.authentication_service.Security;
 
 import java.util.Collection;
 import java.util.List;
