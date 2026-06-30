@@ -25,9 +25,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.ReunionSphere.User_Service.Security.UserPrincipal;
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
+@Slf4j
 public class UserController {
      // Injecting User Service
      private final UserService userService;
@@ -52,9 +57,19 @@ public class UserController {
 
      // Updating User Profile
      @PutMapping("/{userId}")
-     public ResponseEntity<UserProfileDto> updateUser(@PathVariable String userId,
+     public ResponseEntity<?> updateUser(@PathVariable String userId,
                @RequestPart(value = "profileImage", required = false) MultipartFile image,
-               @RequestPart(value = "registerUserDto") UserProfileDto userProfileDto) {
+               @RequestPart(value = "registerUserDto") UserProfileDto userProfileDto,
+               @AuthenticationPrincipal UserPrincipal principal) {
+          
+          if (principal == null || !userId.equals(principal.userId())) {
+               log.warn("Unauthorized update attempt for user {} by {}", userId, 
+                         principal != null ? principal.userId() : "unknown");
+               return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                         .body("You are not authorized to update this profile");
+          }
+          
+          log.info("Updating user profile for user {}", userId);
           return ResponseEntity.status(HttpStatus.FOUND).body(userService.updateUserProfile(image, userProfileDto));
      }
 

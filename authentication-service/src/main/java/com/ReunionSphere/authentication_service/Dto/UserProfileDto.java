@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UserProfileDto {
-     private String authId;
+     private String userId;
+     private String authUserId;
      private String firstName;
      private String middleName;
      private String lastName;

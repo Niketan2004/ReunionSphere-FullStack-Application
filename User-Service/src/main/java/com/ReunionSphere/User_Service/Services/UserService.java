@@ -104,7 +104,7 @@ public class UserService {
                          return new UserNotfoundException("User does not exists with id " + user.getUserId());
                     });
           // Uploading images to cloudinary
-          if (image != null) {  
+          if (image != null) {
                log.debug("Uploading Profile Image to cloudinary");
                CloudinaryResponse response = uploadImage(image);
                user.setProfileImageUrl(response.getSecureUrl());
@@ -132,11 +132,13 @@ public class UserService {
       */
      @Transactional
      public UserProfileDto createUserProfile(RegisterUserDto registerUser) {
-          log.info("Creating user profile for email: {}", registerUser != null ? registerUser.getEmail() : "null");
           if (registerUser == null) {
                log.error("Register user DTO is null");
                throw new IllegalArgumentException("User details should be provided");
           }
+          log.info("Register userDto is recieved {}", registerUser.toString());
+          log.info("Creating user profile for email: {} with authId {}",
+                    registerUser != null ? registerUser.getEmail() : "null", registerUser.getAuthUserId());
 
           if (userProfilesRepo.findUserIdByPhoneNumber(registerUser.getPhoneNumber()) != null
                     || userProfilesRepo.findByEmail(registerUser.getEmail()).isPresent()) {
@@ -155,7 +157,6 @@ public class UserService {
                     locationService.createLocation(registerUser.getLocation()));
 
           UserProfiles userProfiles = new UserProfiles();
-          
 
           userProfiles.setAuthUserId(registerUser.getAuthUserId());
           userProfiles.setFirstName(registerUser.getFirstName());

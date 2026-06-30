@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.ReunionSphere.authentication_service.Enums.Roles;
@@ -44,25 +43,7 @@ public class JwtTokenProvider {
           return Keys.hmacShaKeyFor(jwtSecret.getBytes());
      }
 
-     /**
-      * Generates a standard JWT access token based on an active Spring Security {@link Authentication}.
-      *
-      * @param authentication the active user authentication object
-      * @return the signed JWT string
-      */
-     public String generateToken(Authentication authentication) {
-          String userName = authentication.getName();
-          
-          Date now = new Date();
-          Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
-          return Jwts.builder()
-                    .subject(userName)
-                    .issuedAt(now)
-                    .expiration(expiryDate)
-                    .signWith(getSigningKey())
-                    .compact();
-     }
 
      /**
       * Generates a custom JWT access token containing explicit user identity and role claims.
@@ -94,6 +75,7 @@ public class JwtTokenProvider {
      public String getUserEmailFromJWT(String token) {
           Claims claims = Jwts.parser()
                     .verifyWith(getSigningKey())
+                    .clockSkewSeconds(60) // Add clock skew allowance
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -110,6 +92,7 @@ public class JwtTokenProvider {
           try {
                Jwts.parser()
                          .verifyWith(getSigningKey())
+                         .clockSkewSeconds(60) // Add clock skew allowance
                          .build()
                          .parseSignedClaims(authToken);
                return true;

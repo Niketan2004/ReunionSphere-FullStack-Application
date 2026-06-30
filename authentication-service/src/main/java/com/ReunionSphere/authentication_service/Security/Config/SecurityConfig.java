@@ -67,7 +67,7 @@ public class SecurityConfig {
                     // Establish access control rules for public authentication endpoints and API
                     // documentation
                     .authorizeHttpRequests(auth -> auth
-                              .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/actuator/**")
+                              .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui.html", "/actuator/**")
                               .permitAll()
                               .anyRequest().authenticated())
 

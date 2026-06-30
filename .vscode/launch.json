@@ -4,6 +4,13 @@
                "type": "java",
                "name": "LostAndFoundServiceApplication",
                "request": "launch",
+               "mainClass": "com.ReunionSphere.LostAndFoundService.LostAndFoundServiceApplication",
+               "projectName": "LostAndFoundService"
+          },
+          {
+               "type": "java",
+               "name": "LostAndFoundServiceApplication",
+               "request": "launch",
                "mainClass": "com.ReuinonSphere.LostAndFoundService.LostAndFoundServiceApplication",
                "projectName": "LostAndFoundService"
           },

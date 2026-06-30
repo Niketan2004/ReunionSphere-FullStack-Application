@@ -1,18 +1,22 @@
 package com.ReunionSphere.api_gateway.Services;
 
-import java.util.Date;
-
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * JWT service for the API Gateway.
+ * <p>
+ * Only validates token integrity for early rejection.
+ * Does NOT extract claims — downstream services handle that independently.
+ */
 @Service
+@Slf4j
 public class JwtService {
 
      @Value("${jwt.secret}")
@@ -23,68 +27,23 @@ public class JwtService {
      }
 
      /**
-      * Extract all claims from JWT
-      */
-     public Claims extractAllClaims(String token) {
-          return Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-     }
-
-     /**
-      * Extract email (subject)
-      */
-     public String extractEmail(String token) {
-          return extractAllClaims(token).getSubject();
-     }
-
-     /**
-      * Extract userId
-      */
-     public String extractUserId(String token) {
-          return extractAllClaims(token)
-                    .get("userId", String.class);
-     }
-
-     /**
-      * Extract role
-      */
-     public String extractRole(String token) {
-          return extractAllClaims(token)
-                    .get("role", String.class);
-     }
-
-     /**
-      * Check expiration
-      */
-     public boolean isTokenExpired(String token) {
-          Date expiration = extractAllClaims(token)
-                    .getExpiration();
-          return expiration.before(new Date());
-     }
-     
-     public Claims getClaims(String token) {
-
-          return Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-     }
-
-     /**
-      * Validate JWT
+      * Validates the JWT token's cryptographic signature and expiration.
+      * Uses clock skew tolerance for distributed microservice environments.
+      *
+      * @param token the raw JWT string
+      * @return true if valid, false otherwise
       */
      public boolean validateToken(String token) {
           try {
-               return !isTokenExpired(token);
-          } catch (JwtException ex) {
-               return false;
+               Jwts.parser()
+                         .verifyWith(getSigningKey())
+                         .clockSkewSeconds(60)
+                         .build()
+                         .parseSignedClaims(token);
+               return true;
           } catch (Exception ex) {
+               log.warn("JWT validation failed at gateway: {}", ex.getMessage());
                return false;
           }
      }
-
 }

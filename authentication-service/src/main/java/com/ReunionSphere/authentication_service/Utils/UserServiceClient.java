@@ -10,5 +10,5 @@ import com.ReunionSphere.authentication_service.Dto.UserProfileDto;
 public interface UserServiceClient {
 
      @PostMapping("/api/v1/users/")
-     void createUser(@RequestBody UserProfileDto dto);
+     UserProfileDto createUser(@RequestBody UserProfileDto dto);
 }
